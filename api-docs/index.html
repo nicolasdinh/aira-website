@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>API Documentation — AIRA</title>
+  <meta name="description" content="Complete API reference for AIRA's card program management platform" />
+
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+  <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .api-nav-btn {
+      width: 100%;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      transition: background-color .15s, color .15s;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+    .api-nav-btn:hover { background-color: var(--muted); color: var(--foreground); }
+    .api-nav-btn.active { background-color: var(--primary); color: var(--primary-foreground); }
+    .code-block {
+      background: var(--background);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .code-block.muted { background: var(--muted); border: 0; }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      height: 2rem;
+      padding: 0 0.75rem;
+      border-radius: 0.375rem;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted-foreground);
+      transition: background-color .15s, color .15s;
+    }
+    .copy-btn:hover { background: var(--muted); color: var(--foreground); }
+  </style>
+</head>
+<body class="min-h-screen bg-background">
+  <!-- ========== Header ========== -->
+  <header class="header-blur w-full bg-header">
+    <div class="container mx-auto flex h-[92px] items-center justify-between px-4">
+      <a href="/" class="flex items-center gap-2">
+        <img src="/AIRA-logo.png" alt="AIRA" class="h-[180px] w-auto" />
+      </a>
+      <nav class="hidden md:flex items-center gap-16">
+        <a href="/#features" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
+        <a href="/#how-it-works" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">How It Works</a>
+        <a href="/#benefits" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Benefits</a>
+        <a href="/api-docs/" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">API Docs</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <a href="/contact/">
+          <button class="btn-primary-gradient inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 shadow-sm transition-all">
+            Get Started
+          </button>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 border-r border-border bg-card sticky top-0 h-screen overflow-y-auto hidden md:block">
+      <div class="p-6">
+        <h2 class="text-lg font-semibold mb-4">API Reference</h2>
+        <nav class="space-y-1">
+          <button class="api-nav-btn active">Getting Started</button>
+          <button class="api-nav-btn">Account Holders</button>
+          <button class="api-nav-btn">Cards</button>
+          <button class="api-nav-btn">Transactions</button>
+          <button class="api-nav-btn">Credits</button>
+          <button class="api-nav-btn">Debits</button>
+          <button class="api-nav-btn">Statements</button>
+          <button class="api-nav-btn">Payments</button>
+          <button class="api-nav-btn">Simulations</button>
+          <button class="api-nav-btn">Status</button>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="flex-1 p-8 max-w-5xl">
+      <div class="space-y-8">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">AIRA API Documentation</h1>
+          <p class="text-lg text-muted-foreground mb-2">
+            The AIRA API is organized around REST. Our API has predictable resource-oriented URLs,
+            accepts JSON-encoded request bodies, returns JSON-encoded responses, and uses standard
+            HTTP response codes, authentication, and verbs.
+          </p>
+          <p class="text-muted-foreground">
+            You can use the AIRA API in test mode, which doesn't affect your live data. The API key
+            you use to authenticate the request determines whether the request is live mode or test
+            mode.
+          </p>
+        </div>
+
+        <!-- Authentication -->
+        <div class="card p-6 bg-muted/50">
+          <h2 class="text-xl font-semibold mb-3">Authentication</h2>
+          <p class="text-muted-foreground mb-4">
+            The AIRA API uses API keys to authenticate requests. You can view and manage your API
+            keys in the AIRA Dashboard.
+          </p>
+          <p class="text-muted-foreground mb-4">
+            Your API keys carry many privileges, so be sure to keep them secure! Do not share your
+            secret API keys in publicly accessible areas such as GitHub, client-side code, and so
+            forth.
+          </p>
+          <p class="text-muted-foreground mb-4">
+            Authentication to the API is performed via HTTP Bearer Auth. Provide your API key as
+            the bearer token value:
+          </p>
+          <div class="relative">
+            <pre class="code-block"><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+            <button class="copy-btn" onclick="copyText(this)" data-text="Authorization: Bearer YOUR_API_KEY" title="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+            </button>
+          </div>
+          <p class="text-sm text-muted-foreground mt-4">
+            All API requests must be made over HTTPS. Calls made over plain HTTP will fail. API
+            requests without authentication will also fail.
+          </p>
+        </div>
+
+        <!-- Base URL -->
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Base URL</h2>
+          <p class="text-muted-foreground mb-4">
+            All API requests should be made to the following base URL:
+          </p>
+          <div class="relative">
+            <pre class="code-block muted"><code>https://api.aira.ai/v1</code></pre>
+            <button class="copy-btn" onclick="copyText(this)" data-text="https://api.aira.ai/v1" title="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Errors -->
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Errors</h2>
+          <p class="text-muted-foreground mb-4">
+            AIRA uses conventional HTTP response codes to indicate the success or failure of an API
+            request. In general: Codes in the 2xx range indicate success. Codes in the 4xx range
+            indicate an error that failed given the information provided (e.g., a required
+            parameter was omitted, authentication failed, etc.). Codes in the 5xx range indicate an
+            error with AIRA's servers.
+          </p>
+          <div class="space-y-2 text-sm">
+            <div class="flex gap-3"><code class="font-semibold" style="color:#16a34a;">200</code><span class="text-muted-foreground">Everything worked as expected.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">400</code><span class="text-muted-foreground">Bad Request – The request was unacceptable, often due to missing a required parameter.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">401</code><span class="text-muted-foreground">Unauthorized – No valid API key provided.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">404</code><span class="text-muted-foreground">Not Found – The requested resource doesn't exist.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#dc2626;">500</code><span class="text-muted-foreground">Server Error – Something went wrong on AIRA's end.</span></div>
+          </div>
+        </div>
+
+        <!-- Quick Start -->
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Quick Start</h2>
+          <p class="text-muted-foreground mb-4">Get started with the AIRA API in minutes:</p>
+          <ol class="list-decimal list-inside space-y-3 text-muted-foreground">
+            <li><span class="font-medium text-foreground">Obtain your API key</span> – Contact our sales team to get access to the AIRA API and receive your API credentials.</li>
+            <li>
+              <span class="font-medium text-foreground">Make your first request</span> – Try the API status endpoint to verify your connection:
+              <pre class="code-block muted text-xs mt-2 ml-6"><code>curl https://api.aira.ai/v1/status \
+  -H "Authorization: Bearer YOUR_API_KEY"</code></pre>
+            </li>
+            <li><span class="font-medium text-foreground">Create an account holder</span> – Start by creating an account holder to issue cards to.</li>
+            <li><span class="font-medium text-foreground">Issue a card</span> – Create virtual or physical cards for your account holders.</li>
+            <li><span class="font-medium text-foreground">Test with simulations</span> – Use the simulation endpoints to test authorization flows without real transactions.</li>
+          </ol>
+        </div>
+
+        <!-- Need Help -->
+        <div class="card p-6 bg-primary/5 border-primary/20">
+          <h2 class="text-xl font-semibold mb-3">Need Help?</h2>
+          <p class="text-muted-foreground mb-4">
+            If you have questions or need assistance integrating with the AIRA API, our team is
+            here to help.
+          </p>
+          <a href="/contact/">
+            <button class="btn-primary-gradient inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 shadow-sm transition-all">
+              Contact Support
+            </button>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="border-t border-border/40 py-16 px-4 bg-secondary/20">
+    <div class="container mx-auto max-w-7xl">
+      <p class="text-sm text-muted-foreground">© 2026 AIRA.AI All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    function copyText(btn) {
+      const text = btn.getAttribute('data-text');
+      navigator.clipboard?.writeText(text);
+      const orig = btn.innerHTML;
+      btn.textContent = 'Copied';
+      setTimeout(() => { btn.innerHTML = orig; }, 1200);
+    }
+  </script>
+</body>
+</html>

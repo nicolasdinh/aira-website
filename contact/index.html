@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact — AIRA</title>
+  <meta name="description" content="Get started with AIRA. Tell us about your card program needs." />
+
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+  <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="min-h-screen bg-background">
+  <div class="flex min-h-screen flex-col">
+    <!-- ========== Header ========== -->
+    <header class="header-blur w-full bg-header">
+      <div class="container mx-auto flex h-[92px] items-center justify-between px-4">
+        <a href="/" class="flex items-center gap-2">
+          <img src="/AIRA-logo.png" alt="AIRA" class="h-[180px] w-auto" />
+        </a>
+        <nav class="hidden md:flex items-center gap-16">
+          <a href="/#features" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
+          <a href="/#how-it-works" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">How It Works</a>
+          <a href="/#benefits" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Benefits</a>
+          <a href="/api-docs/" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">API Docs</a>
+        </nav>
+        <div class="flex items-center gap-4">
+          <a href="/contact/">
+            <button class="btn-primary-gradient inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 shadow-sm transition-all">
+              Get Started
+            </button>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1">
+      <section class="py-24 md:py-36 px-4 bg-hero relative overflow-hidden">
+        <div class="blur-blob cyan-purple" style="top:5rem; right:2.5rem; width:24rem; height:24rem;"></div>
+        <div class="blur-blob purple-cyan" style="bottom:5rem; left:2.5rem; width:24rem; height:24rem;"></div>
+
+        <div class="container mx-auto max-w-2xl relative">
+          <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 text-balance">Get Started with AIRA</h1>
+            <p class="text-lg text-muted-foreground leading-relaxed">
+              Fill out the form below and we'll get back to you shortly to discuss how AIRA can
+              power your card program.
+            </p>
+          </div>
+
+          <div class="bg-card border border-border rounded-2xl p-8 md:p-12">
+            <!-- Success / error banners -->
+            <div id="form-success" class="hidden mb-6 p-4 rounded-md text-sm"
+                 style="background-color: color-mix(in oklab, var(--aira-cyan) 10%, transparent); color: var(--aira-navy); border: 1px solid color-mix(in oklab, var(--aira-cyan) 30%, transparent);">
+              Thanks! Your message has been received — we'll be in touch shortly.
+            </div>
+            <div id="form-error" class="hidden mb-6 p-4 rounded-md text-sm"
+                 style="background-color: rgba(220, 38, 38, 0.08); color: rgb(153, 27, 27); border: 1px solid rgba(220, 38, 38, 0.25);">
+              Something went wrong. Please try again or email us directly.
+            </div>
+
+            <form id="contact-form" class="space-y-6" novalidate>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label for="firstName" class="flex items-center gap-2 text-sm leading-none font-medium">First Name *</label>
+                  <input class="form-input" id="firstName" required placeholder="John" name="firstName" />
+                </div>
+                <div class="space-y-2">
+                  <label for="lastName" class="flex items-center gap-2 text-sm leading-none font-medium">Last Name *</label>
+                  <input class="form-input" id="lastName" required placeholder="Doe" name="lastName" />
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label for="email" class="flex items-center gap-2 text-sm leading-none font-medium">Email *</label>
+                <input type="email" class="form-input" id="email" required placeholder="john@company.com" name="email" />
+              </div>
+              <div class="space-y-2">
+                <label for="company" class="flex items-center gap-2 text-sm leading-none font-medium">Company *</label>
+                <input class="form-input" id="company" required placeholder="Your Company" name="company" />
+              </div>
+              <div class="space-y-2">
+                <label for="phone" class="flex items-center gap-2 text-sm leading-none font-medium">Phone Number</label>
+                <input type="tel" class="form-input" id="phone" placeholder="+1 (555) 000-0000" name="phone" />
+              </div>
+              <div class="space-y-2">
+                <label for="message" class="flex items-center gap-2 text-sm leading-none font-medium">Message *</label>
+                <textarea class="form-input form-textarea" id="message" name="message" required
+                          placeholder="Tell us about your card program needs..." rows="5"></textarea>
+              </div>
+              <button id="submit-btn" type="submit"
+                      class="btn-primary-gradient inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium h-10 rounded-md px-6 w-full shadow-sm transition-all">
+                <span id="submit-label">Submit</span>
+                <svg class="ml-2 icon-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-border/40 py-16 px-4 bg-secondary/20">
+      <div class="container mx-auto max-w-7xl">
+        <p class="text-sm text-muted-foreground">© 2026 AIRA.AI All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // ---------------------------------------------------------------
+    // Contact form → Google Sheets (via Google Apps Script Web App).
+    // Paste your deployed Apps Script Web App URL below. See
+    // /apps-script/README.md in this repo for one-time setup steps.
+    // ---------------------------------------------------------------
+    const APPS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitLabel = document.getElementById('submit-label');
+    const okBanner = document.getElementById('form-success');
+    const errBanner = document.getElementById('form-error');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      okBanner.classList.add('hidden');
+      errBanner.classList.add('hidden');
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const payload = Object.fromEntries(new FormData(form).entries());
+      payload.submittedAt = new Date().toISOString();
+      payload.userAgent = navigator.userAgent;
+
+      submitBtn.disabled = true;
+      submitLabel.textContent = 'Sending...';
+
+      try {
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE_')) {
+          throw new Error('Apps Script URL not configured');
+        }
+        // Use text/plain to avoid the CORS preflight; Apps Script parses
+        // the body in doPost(e.postData.contents).
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+        form.reset();
+        okBanner.classList.remove('hidden');
+      } catch (err) {
+        console.error(err);
+        errBanner.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitLabel.textContent = 'Submit';
+      }
+    });
+  </script>
+</body>
+</html>
