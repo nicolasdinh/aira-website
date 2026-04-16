@@ -34,6 +34,7 @@
     }
     .api-nav-btn:hover { background-color: var(--muted); color: var(--foreground); }
     .api-nav-btn.active { background-color: var(--primary); color: var(--primary-foreground); }
+
     .code-block {
       background: var(--background);
       padding: 1rem;
@@ -42,8 +43,11 @@
       font-size: 0.875rem;
       border: 1px solid var(--border);
       position: relative;
+      white-space: pre;
+      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
     }
     .code-block.muted { background: var(--muted); border: 0; }
+
     .copy-btn {
       position: absolute;
       top: 0.5rem;
@@ -55,9 +59,77 @@
       background: transparent;
       cursor: pointer;
       color: var(--muted-foreground);
+      font-size: 0.75rem;
       transition: background-color .15s, color .15s;
     }
-    .copy-btn:hover { background: var(--muted); color: var(--foreground); }
+    .copy-btn:hover { background: color-mix(in oklab, var(--border) 60%, transparent); color: var(--foreground); }
+
+    .method-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: ui-monospace, monospace;
+      margin-right: 0.5rem;
+    }
+    .method-get  { background: #dcfce7; color: #166534; }
+    .method-post { background: #dbeafe; color: #1e40af; }
+    .method-put  { background: #fef9c3; color: #854d0e; }
+    .method-delete { background: #fee2e2; color: #991b1b; }
+
+    .endpoint-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: var(--card);
+    }
+    .endpoint-path {
+      font-family: ui-monospace, monospace;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .endpoint-desc {
+      font-size: 0.8125rem;
+      color: var(--muted-foreground);
+      margin-top: 0.125rem;
+    }
+
+    .param-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .param-table th {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      background: var(--muted);
+      color: var(--muted-foreground);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .param-table td { padding: 0.625rem 0.75rem; border-top: 1px solid var(--border); vertical-align: top; }
+    .param-name { font-family: ui-monospace, monospace; font-size: 0.8125rem; font-weight: 600; }
+    .param-type { font-size: 0.75rem; color: var(--aira-purple); font-family: ui-monospace, monospace; }
+    .required-badge {
+      display: inline-block;
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.0625rem 0.375rem;
+      border-radius: 9999px;
+      background: color-mix(in oklab, var(--aira-cyan) 15%, transparent);
+      color: var(--aira-navy);
+      margin-left: 0.375rem;
+      vertical-align: middle;
+    }
+
+    /* Sections */
+    .api-section { display: none; }
+    .api-section.active { display: block; }
   </style>
 </head>
 <body class="min-h-screen bg-background">
@@ -68,10 +140,10 @@
         <img src="../AIRA-logo.png" alt="AIRA" class="h-[180px] w-auto" />
       </a>
       <nav class="hidden md:flex items-center gap-16">
-        <a href="../#features" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
+        <a href="../#features"    class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
         <a href="../#how-it-works" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">How It Works</a>
-        <a href="../#benefits" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Benefits</a>
-        <a href="index.html" class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">API Docs</a>
+        <a href="../#benefits"    class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">Benefits</a>
+        <a href="index.html"      class="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">API Docs</a>
       </nav>
       <div class="flex items-center gap-4">
         <a href="../contact/index.html">
@@ -84,27 +156,30 @@
   </header>
 
   <div class="flex">
-    <!-- Sidebar -->
-    <aside class="w-64 border-r border-border bg-card sticky top-0 h-screen overflow-y-auto hidden md:block">
+    <!-- ========== Sidebar ========== -->
+    <aside class="w-64 border-r border-border bg-card sticky top-0 h-screen overflow-y-auto hidden md:block" style="top: 92px;">
       <div class="p-6">
         <h2 class="text-lg font-semibold mb-4">API Reference</h2>
-        <nav class="space-y-1">
-          <button class="api-nav-btn active">Getting Started</button>
-          <button class="api-nav-btn">Account Holders</button>
-          <button class="api-nav-btn">Cards</button>
-          <button class="api-nav-btn">Transactions</button>
-          <button class="api-nav-btn">Credits</button>
-          <button class="api-nav-btn">Debits</button>
-          <button class="api-nav-btn">Statements</button>
-          <button class="api-nav-btn">Payments</button>
-          <button class="api-nav-btn">Simulations</button>
-          <button class="api-nav-btn">Status</button>
+        <nav class="space-y-1" id="api-nav">
+          <button class="api-nav-btn active" data-target="getting-started">Getting Started</button>
+          <button class="api-nav-btn" data-target="account-holders">Account Holders</button>
+          <button class="api-nav-btn" data-target="cards">Cards</button>
+          <button class="api-nav-btn" data-target="transactions">Transactions</button>
+          <button class="api-nav-btn" data-target="credits">Credits</button>
+          <button class="api-nav-btn" data-target="debits">Debits</button>
+          <button class="api-nav-btn" data-target="statements">Statements</button>
+          <button class="api-nav-btn" data-target="payments">Payments</button>
+          <button class="api-nav-btn" data-target="simulations">Simulations</button>
+          <button class="api-nav-btn" data-target="status">Status</button>
         </nav>
       </div>
     </aside>
 
+    <!-- ========== Content ========== -->
     <main class="flex-1 p-8 max-w-5xl">
-      <div class="space-y-8">
+
+      <!-- ── Getting Started ── -->
+      <div class="api-section active space-y-8" id="getting-started">
         <div>
           <h1 class="text-4xl font-bold mb-4">AIRA API Documentation</h1>
           <p class="text-lg text-muted-foreground mb-2">
@@ -114,88 +189,55 @@
           </p>
           <p class="text-muted-foreground">
             You can use the AIRA API in test mode, which doesn't affect your live data. The API key
-            you use to authenticate the request determines whether the request is live mode or test
-            mode.
+            you use to authenticate the request determines whether the request is live mode or test mode.
           </p>
         </div>
 
-        <!-- Authentication -->
         <div class="card p-6 bg-muted/50">
           <h2 class="text-xl font-semibold mb-3">Authentication</h2>
           <p class="text-muted-foreground mb-4">
-            The AIRA API uses API keys to authenticate requests. You can view and manage your API
-            keys in the AIRA Dashboard.
-          </p>
-          <p class="text-muted-foreground mb-4">
-            Your API keys carry many privileges, so be sure to keep them secure! Do not share your
-            secret API keys in publicly accessible areas such as GitHub, client-side code, and so
-            forth.
-          </p>
-          <p class="text-muted-foreground mb-4">
-            Authentication to the API is performed via HTTP Bearer Auth. Provide your API key as
-            the bearer token value:
+            The AIRA API uses API keys to authenticate requests. Provide your API key as a Bearer token:
           </p>
           <div class="relative">
-            <pre class="code-block"><code>Authorization: Bearer YOUR_API_KEY</code></pre>
-            <button class="copy-btn" onclick="copyText(this)" data-text="Authorization: Bearer YOUR_API_KEY" title="Copy">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
-              </svg>
-            </button>
+            <div class="code-block">Authorization: Bearer YOUR_API_KEY</div>
+            <button class="copy-btn" onclick="copyText(this, 'Authorization: Bearer YOUR_API_KEY')">Copy</button>
           </div>
           <p class="text-sm text-muted-foreground mt-4">
-            All API requests must be made over HTTPS. Calls made over plain HTTP will fail. API
-            requests without authentication will also fail.
+            All API requests must be made over HTTPS. Calls made over plain HTTP will fail.
           </p>
         </div>
 
-        <!-- Base URL -->
         <div class="card p-6">
           <h2 class="text-xl font-semibold mb-3">Base URL</h2>
-          <p class="text-muted-foreground mb-4">
-            All API requests should be made to the following base URL:
-          </p>
           <div class="relative">
-            <pre class="code-block muted"><code>https://api.aira.ai/v1</code></pre>
-            <button class="copy-btn" onclick="copyText(this)" data-text="https://api.aira.ai/v1" title="Copy">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
-              </svg>
-            </button>
+            <div class="code-block muted">https://api.aira.ai/v1</div>
+            <button class="copy-btn" onclick="copyText(this, 'https://api.aira.ai/v1')">Copy</button>
           </div>
         </div>
 
-        <!-- Errors -->
         <div class="card p-6">
           <h2 class="text-xl font-semibold mb-3">Errors</h2>
-          <p class="text-muted-foreground mb-4">
-            AIRA uses conventional HTTP response codes to indicate the success or failure of an API
-            request. In general: Codes in the 2xx range indicate success. Codes in the 4xx range
-            indicate an error that failed given the information provided (e.g., a required
-            parameter was omitted, authentication failed, etc.). Codes in the 5xx range indicate an
-            error with AIRA's servers.
-          </p>
+          <p class="text-muted-foreground mb-4">AIRA uses conventional HTTP response codes to indicate success or failure.</p>
           <div class="space-y-2 text-sm">
             <div class="flex gap-3"><code class="font-semibold" style="color:#16a34a;">200</code><span class="text-muted-foreground">Everything worked as expected.</span></div>
-            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">400</code><span class="text-muted-foreground">Bad Request – The request was unacceptable, often due to missing a required parameter.</span></div>
-            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">401</code><span class="text-muted-foreground">Unauthorized – No valid API key provided.</span></div>
-            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">404</code><span class="text-muted-foreground">Not Found – The requested resource doesn't exist.</span></div>
-            <div class="flex gap-3"><code class="font-semibold" style="color:#dc2626;">500</code><span class="text-muted-foreground">Server Error – Something went wrong on AIRA's end.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">400</code><span class="text-muted-foreground">Bad Request – missing or invalid parameter.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">401</code><span class="text-muted-foreground">Unauthorized – no valid API key provided.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#ca8a04;">404</code><span class="text-muted-foreground">Not Found – the requested resource doesn't exist.</span></div>
+            <div class="flex gap-3"><code class="font-semibold" style="color:#dc2626;">500</code><span class="text-muted-foreground">Server Error – something went wrong on AIRA's end.</span></div>
           </div>
         </div>
 
-        <!-- Quick Start -->
         <div class="card p-6">
           <h2 class="text-xl font-semibold mb-3">Quick Start</h2>
-          <p class="text-muted-foreground mb-4">Get started with the AIRA API in minutes:</p>
           <ol class="list-decimal list-inside space-y-3 text-muted-foreground">
-            <li><span class="font-medium text-foreground">Obtain your API key</span> – Contact our sales team to get access to the AIRA API and receive your API credentials.</li>
+            <li><span class="font-medium text-foreground">Obtain your API key</span> – Contact our sales team to get access and receive your credentials.</li>
             <li>
-              <span class="font-medium text-foreground">Make your first request</span> – Try the API status endpoint to verify your connection:
-              <pre class="code-block muted text-xs mt-2 ml-6"><code>curl https://api.aira.ai/v1/status \
-  -H "Authorization: Bearer YOUR_API_KEY"</code></pre>
+              <span class="font-medium text-foreground">Make your first request</span>
+              <div class="relative mt-2 ml-6">
+                <div class="code-block muted text-xs">curl https://api.aira.ai/v1/status \
+  -H "Authorization: Bearer YOUR_API_KEY"</div>
+                <button class="copy-btn" onclick="copyText(this, 'curl https://api.aira.ai/v1/status \\\n  -H \"Authorization: Bearer YOUR_API_KEY\"')">Copy</button>
+              </div>
             </li>
             <li><span class="font-medium text-foreground">Create an account holder</span> – Start by creating an account holder to issue cards to.</li>
             <li><span class="font-medium text-foreground">Issue a card</span> – Create virtual or physical cards for your account holders.</li>
@@ -203,13 +245,9 @@
           </ol>
         </div>
 
-        <!-- Need Help -->
         <div class="card p-6 bg-primary/5 border-primary/20">
           <h2 class="text-xl font-semibold mb-3">Need Help?</h2>
-          <p class="text-muted-foreground mb-4">
-            If you have questions or need assistance integrating with the AIRA API, our team is
-            here to help.
-          </p>
+          <p class="text-muted-foreground mb-4">If you have questions or need assistance, our team is here to help.</p>
           <a href="../contact/index.html">
             <button class="btn-primary-gradient inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 shadow-sm transition-all">
               Contact Support
@@ -217,6 +255,413 @@
           </a>
         </div>
       </div>
+
+      <!-- ── Account Holders ── -->
+      <div class="api-section space-y-8" id="account-holders">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Account Holders</h1>
+          <p class="text-lg text-muted-foreground">
+            Account holders represent the individuals or businesses that hold cards on your program.
+            Create an account holder before issuing any cards.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/account-holders</span><div class="endpoint-desc">Create a new account holder</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/account-holders/{id}</span><div class="endpoint-desc">Retrieve an account holder</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-put">PUT</span><span class="endpoint-path">/account-holders/{id}</span><div class="endpoint-desc">Update an account holder</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/account-holders</span><div class="endpoint-desc">List all account holders</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Create an Account Holder</h2>
+          <p class="text-muted-foreground mb-4">Creates a new individual or business account holder and runs automated KYC checks.</p>
+          <h3 class="font-semibold mb-3">Parameters</h3>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">type</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Either <code>individual</code> or <code>business</code>.</td></tr>
+                <tr><td><span class="param-name">first_name</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">First name (individual only).</td></tr>
+                <tr><td><span class="param-name">last_name</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Last name (individual only).</td></tr>
+                <tr><td><span class="param-name">email</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Email address of the account holder.</td></tr>
+                <tr><td><span class="param-name">date_of_birth</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ISO 8601 date (individual only). Required for KYC.</td></tr>
+                <tr><td><span class="param-name">address</span></td><td><span class="param-type">object</span></td><td class="text-muted-foreground">Billing address object with <code>line1</code>, <code>city</code>, <code>state</code>, <code>postal_code</code>, <code>country</code>.</td></tr>
+                <tr><td><span class="param-name">metadata</span></td><td><span class="param-type">object</span></td><td class="text-muted-foreground">Set of key-value pairs for storing additional information.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="font-semibold mt-6 mb-3">Example request</h3>
+          <div class="relative">
+            <div class="code-block">curl https://api.aira.ai/v1/account-holders \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "individual",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "jane@example.com",
+    "date_of_birth": "1990-05-15",
+    "address": {
+      "line1": "123 Main St",
+      "city": "San Francisco",
+      "state": "CA",
+      "postal_code": "94105",
+      "country": "US"
+    }
+  }'</div>
+            <button class="copy-btn" onclick="copyText(this, this.previousElementSibling.textContent)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Cards ── -->
+      <div class="api-section space-y-8" id="cards">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Cards</h1>
+          <p class="text-lg text-muted-foreground">
+            Issue virtual or physical cards to your account holders. Cards can be single-use or reloadable,
+            and can be assigned spending controls and limits.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/cards</span><div class="endpoint-desc">Issue a new card</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/cards/{id}</span><div class="endpoint-desc">Retrieve a card</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-put">PUT</span><span class="endpoint-path">/cards/{id}</span><div class="endpoint-desc">Update card spending controls</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-put">PUT</span><span class="endpoint-path">/cards/{id}/status</span><div class="endpoint-desc">Activate, suspend, or cancel a card</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/cards</span><div class="endpoint-desc">List all cards</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Issue a Card</h2>
+          <p class="text-muted-foreground mb-4">Issues a virtual or physical card to an existing account holder.</p>
+          <h3 class="font-semibold mb-3">Parameters</h3>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">account_holder_id</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ID of the account holder to issue the card to.</td></tr>
+                <tr><td><span class="param-name">type</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground"><code>virtual</code> or <code>physical</code>.</td></tr>
+                <tr><td><span class="param-name">program</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground"><code>prepaid</code>, <code>single_use</code>, or <code>small_business</code>.</td></tr>
+                <tr><td><span class="param-name">spending_controls</span></td><td><span class="param-type">object</span></td><td class="text-muted-foreground">Optional spending limits and merchant category restrictions.</td></tr>
+                <tr><td><span class="param-name">metadata</span></td><td><span class="param-type">object</span></td><td class="text-muted-foreground">Set of key-value pairs for storing additional information.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="font-semibold mt-6 mb-3">Example request</h3>
+          <div class="relative">
+            <div class="code-block">curl https://api.aira.ai/v1/cards \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_holder_id": "ah_1A2B3C4D",
+    "type": "virtual",
+    "program": "prepaid",
+    "spending_controls": {
+      "spending_limits": [
+        { "amount": 50000, "interval": "monthly" }
+      ]
+    }
+  }'</div>
+            <button class="copy-btn" onclick="copyText(this, this.previousElementSibling.textContent)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Transactions ── -->
+      <div class="api-section space-y-8" id="transactions">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Transactions</h1>
+          <p class="text-lg text-muted-foreground">
+            Transactions represent card authorizations, captures, and declines. Each transaction is
+            linked to a card and an account holder.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/transactions/{id}</span><div class="endpoint-desc">Retrieve a transaction</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/transactions</span><div class="endpoint-desc">List all transactions</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">List Transactions</h2>
+          <p class="text-muted-foreground mb-4">Returns a paginated list of transactions, optionally filtered by card or date range.</p>
+          <h3 class="font-semibold mb-3">Query parameters</h3>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">card_id</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Filter by card ID.</td></tr>
+                <tr><td><span class="param-name">account_holder_id</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Filter by account holder ID.</td></tr>
+                <tr><td><span class="param-name">status</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground"><code>pending</code>, <code>settled</code>, or <code>declined</code>.</td></tr>
+                <tr><td><span class="param-name">created_after</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ISO 8601 timestamp — return transactions created after this time.</td></tr>
+                <tr><td><span class="param-name">created_before</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ISO 8601 timestamp — return transactions created before this time.</td></tr>
+                <tr><td><span class="param-name">limit</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Number of results per page (default 25, max 100).</td></tr>
+                <tr><td><span class="param-name">cursor</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Pagination cursor from a previous response.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="font-semibold mt-6 mb-3">Example request</h3>
+          <div class="relative">
+            <div class="code-block">curl "https://api.aira.ai/v1/transactions?card_id=card_XYZ&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"</div>
+            <button class="copy-btn" onclick="copyText(this, this.previousElementSibling.textContent)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Credits ── -->
+      <div class="api-section space-y-8" id="credits">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Credits</h1>
+          <p class="text-lg text-muted-foreground">
+            Credits add funds to a card's available balance. Use credits to load prepaid cards,
+            issue refunds, or apply promotional balances.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/credits</span><div class="endpoint-desc">Create a credit</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/credits/{id}</span><div class="endpoint-desc">Retrieve a credit</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/credits</span><div class="endpoint-desc">List all credits</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Create a Credit</h2>
+          <p class="text-muted-foreground mb-4">Adds funds to a card's available balance immediately.</p>
+          <h3 class="font-semibold mb-3">Parameters</h3>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">card_id</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ID of the card to credit.</td></tr>
+                <tr><td><span class="param-name">amount</span><span class="required-badge">required</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Amount in the smallest currency unit (e.g., cents for USD).</td></tr>
+                <tr><td><span class="param-name">currency</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Three-letter ISO 4217 currency code (e.g., <code>USD</code>).</td></tr>
+                <tr><td><span class="param-name">description</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Optional memo shown on the cardholder's statement.</td></tr>
+                <tr><td><span class="param-name">metadata</span></td><td><span class="param-type">object</span></td><td class="text-muted-foreground">Set of key-value pairs for storing additional information.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="font-semibold mt-6 mb-3">Example request</h3>
+          <div class="relative">
+            <div class="code-block">curl https://api.aira.ai/v1/credits \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "card_id": "card_XYZ",
+    "amount": 10000,
+    "currency": "USD",
+    "description": "Initial load"
+  }'</div>
+            <button class="copy-btn" onclick="copyText(this, this.previousElementSibling.textContent)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Debits ── -->
+      <div class="api-section space-y-8" id="debits">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Debits</h1>
+          <p class="text-lg text-muted-foreground">
+            Debits remove funds from a card's available balance. Use debits to reclaim funds,
+            apply fees, or correct erroneous credits.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/debits</span><div class="endpoint-desc">Create a debit</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/debits/{id}</span><div class="endpoint-desc">Retrieve a debit</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/debits</span><div class="endpoint-desc">List all debits</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Create a Debit</h2>
+          <p class="text-muted-foreground mb-4">Removes funds from a card's available balance.</p>
+          <h3 class="font-semibold mb-3">Parameters</h3>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">card_id</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ID of the card to debit.</td></tr>
+                <tr><td><span class="param-name">amount</span><span class="required-badge">required</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Amount in the smallest currency unit.</td></tr>
+                <tr><td><span class="param-name">currency</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Three-letter ISO 4217 currency code.</td></tr>
+                <tr><td><span class="param-name">description</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Optional memo shown on the cardholder's statement.</td></tr>
+                <tr><td><span class="param-name">metadata</span></td><td><span class="param-type">object</span></td><td class="text-muted-foreground">Set of key-value pairs for storing additional information.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Statements ── -->
+      <div class="api-section space-y-8" id="statements">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Statements</h1>
+          <p class="text-lg text-muted-foreground">
+            Statements provide a periodic summary of card activity. Statements are generated
+            automatically at the end of each billing cycle.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/statements/{id}</span><div class="endpoint-desc">Retrieve a statement</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/statements/{id}/transactions</span><div class="endpoint-desc">List transactions on a statement</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/statements</span><div class="endpoint-desc">List all statements</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">The Statement Object</h2>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">id</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Unique identifier for the statement.</td></tr>
+                <tr><td><span class="param-name">card_id</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">The card this statement belongs to.</td></tr>
+                <tr><td><span class="param-name">period_start</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ISO 8601 start date of the statement period.</td></tr>
+                <tr><td><span class="param-name">period_end</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ISO 8601 end date of the statement period.</td></tr>
+                <tr><td><span class="param-name">opening_balance</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Balance at the start of the period (cents).</td></tr>
+                <tr><td><span class="param-name">closing_balance</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Balance at the end of the period (cents).</td></tr>
+                <tr><td><span class="param-name">total_credits</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Total credits applied during the period (cents).</td></tr>
+                <tr><td><span class="param-name">total_debits</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Total debits applied during the period (cents).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Payments ── -->
+      <div class="api-section space-y-8" id="payments">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Payments</h1>
+          <p class="text-lg text-muted-foreground">
+            Payments represent fund transfers between an external bank account and a card's balance.
+            Use payments to automate funding workflows for your card programs.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/payments</span><div class="endpoint-desc">Initiate a payment</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/payments/{id}</span><div class="endpoint-desc">Retrieve a payment</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/payments/{id}/cancel</span><div class="endpoint-desc">Cancel a pending payment</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/payments</span><div class="endpoint-desc">List all payments</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Initiate a Payment</h2>
+          <p class="text-muted-foreground mb-4">Transfers funds from an external bank account to a card balance. Payments typically settle within 1–2 business days.</p>
+          <h3 class="font-semibold mb-3">Parameters</h3>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">card_id</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Destination card ID.</td></tr>
+                <tr><td><span class="param-name">amount</span><span class="required-badge">required</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Amount in the smallest currency unit.</td></tr>
+                <tr><td><span class="param-name">currency</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Three-letter ISO 4217 currency code.</td></tr>
+                <tr><td><span class="param-name">bank_account_id</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Source bank account ID.</td></tr>
+                <tr><td><span class="param-name">description</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Optional description for this payment.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Simulations ── -->
+      <div class="api-section space-y-8" id="simulations">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Simulations</h1>
+          <p class="text-lg text-muted-foreground">
+            Simulation endpoints let you test your integration in test mode without real network
+            activity. Trigger authorizations, reversals, and other card events programmatically.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/simulations/authorizations</span><div class="endpoint-desc">Simulate a card authorization</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/simulations/authorizations/{id}/capture</span><div class="endpoint-desc">Simulate capturing an authorization</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/simulations/authorizations/{id}/void</span><div class="endpoint-desc">Simulate voiding an authorization</div></div></div>
+          <div class="endpoint-row"><div><span class="method-badge method-post">POST</span><span class="endpoint-path">/simulations/payments/{id}/settle</span><div class="endpoint-desc">Simulate settling a pending payment</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Simulate an Authorization</h2>
+          <p class="text-muted-foreground mb-4">Creates a test authorization against a card. Only available in test mode.</p>
+          <h3 class="font-semibold mb-3">Parameters</h3>
+          <div style="overflow-x:auto;">
+            <table class="param-table">
+              <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><span class="param-name">card_id</span><span class="required-badge">required</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">ID of the card to authorize against.</td></tr>
+                <tr><td><span class="param-name">amount</span><span class="required-badge">required</span></td><td><span class="param-type">integer</span></td><td class="text-muted-foreground">Authorization amount in the smallest currency unit.</td></tr>
+                <tr><td><span class="param-name">merchant_name</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Simulated merchant name.</td></tr>
+                <tr><td><span class="param-name">merchant_category_code</span></td><td><span class="param-type">string</span></td><td class="text-muted-foreground">Four-digit MCC for the simulated merchant.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="font-semibold mt-6 mb-3">Example request</h3>
+          <div class="relative">
+            <div class="code-block">curl https://api.aira.ai/v1/simulations/authorizations \
+  -H "Authorization: Bearer YOUR_TEST_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "card_id": "card_XYZ",
+    "amount": 2500,
+    "merchant_name": "Test Merchant",
+    "merchant_category_code": "5411"
+  }'</div>
+            <button class="copy-btn" onclick="copyText(this, this.previousElementSibling.textContent)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Status ── -->
+      <div class="api-section space-y-8" id="status">
+        <div>
+          <h1 class="text-4xl font-bold mb-4">Status</h1>
+          <p class="text-lg text-muted-foreground">
+            Use the status endpoint to verify your API connection and check the health of the
+            AIRA platform.
+          </p>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-4">Endpoints</h2>
+          <div class="endpoint-row"><div><span class="method-badge method-get">GET</span><span class="endpoint-path">/status</span><div class="endpoint-desc">Retrieve platform status</div></div></div>
+        </div>
+
+        <div class="card p-6">
+          <h2 class="text-xl font-semibold mb-3">Retrieve Platform Status</h2>
+          <p class="text-muted-foreground mb-4">Returns the current operational status of the AIRA API and its components. Does not require authentication.</p>
+          <h3 class="font-semibold mt-4 mb-3">Example request</h3>
+          <div class="relative">
+            <div class="code-block">curl https://api.aira.ai/v1/status</div>
+            <button class="copy-btn" onclick="copyText(this, 'curl https://api.aira.ai/v1/status')">Copy</button>
+          </div>
+          <h3 class="font-semibold mt-6 mb-3">Example response</h3>
+          <div class="relative">
+            <div class="code-block muted">{
+  "status": "operational",
+  "components": {
+    "api": "operational",
+    "card_processing": "operational",
+    "kyc": "operational",
+    "payments": "operational"
+  },
+  "updated_at": "2026-04-16T18:00:00Z"
+}</div>
+            <button class="copy-btn" onclick="copyText(this, this.previousElementSibling.textContent)">Copy</button>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -227,12 +672,36 @@
   </footer>
 
   <script>
-    function copyText(btn) {
-      const text = btn.getAttribute('data-text');
-      navigator.clipboard?.writeText(text);
-      const orig = btn.innerHTML;
-      btn.textContent = 'Copied';
-      setTimeout(() => { btn.innerHTML = orig; }, 1200);
+    // ── Sidebar nav switching ──
+    const nav = document.getElementById('api-nav');
+    const sections = document.querySelectorAll('.api-section');
+
+    nav.addEventListener('click', function (e) {
+      const btn = e.target.closest('.api-nav-btn');
+      if (!btn) return;
+
+      const target = btn.dataset.target;
+
+      // Update button styles
+      nav.querySelectorAll('.api-nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Show the matching section, hide the rest
+      sections.forEach(s => {
+        s.classList.toggle('active', s.id === target);
+      });
+
+      // Scroll content area to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ── Copy to clipboard ──
+    function copyText(btn, text) {
+      const content = text || btn.previousElementSibling.textContent;
+      navigator.clipboard?.writeText(content.trim());
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
     }
   </script>
 </body>
