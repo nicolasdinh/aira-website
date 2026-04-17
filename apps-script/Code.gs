@@ -10,6 +10,7 @@
  */
 
 const SHEET_NAME = 'Submissions';
+const NOTIFY_EMAIL = 'nicdinh@gmail.com';
 
 const COLUMNS = [
   'submittedAt',
@@ -42,6 +43,29 @@ function doPost(e) {
       return body[key] != null ? String(body[key]) : '';
     });
     sheet.appendRow(row);
+
+    // Email notification.
+    try {
+      if (NOTIFY_EMAIL) {
+        const subject = 'New AIRA contact: ' +
+          (body.firstName || '') + ' ' + (body.lastName || '') +
+          (body.company ? ' (' + body.company + ')' : '');
+        const lines = COLUMNS.map(function (key) {
+          return key + ': ' + (body[key] != null ? String(body[key]) : '');
+        });
+        lines.push('');
+        lines.push('Sheet: ' + ss.getUrl());
+        MailApp.sendEmail({
+          to: NOTIFY_EMAIL,
+          subject: subject,
+          body: lines.join('\n'),
+          replyTo: body.email || undefined,
+        });
+      }
+    } catch (mailErr) {
+      // Don't fail the submission if email fails.
+      console.error('Mail error:', mailErr);
+    }
 
     return ContentService
       .createTextOutput(JSON.stringify({ ok: true }))
